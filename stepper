@@ -1,0 +1,95 @@
+
+#include <Stepper.h>
+
+const int steps = 120;
+const int del = 1000;
+int temp = 0;
+
+Stepper motor = Stepper(steps, 8, 9, 10, 11);
+
+void setup() {
+  
+  motor.setSpeed(10);
+  Serial.begin(9600);
+
+  Serial.print("Motor hazirdir. ");
+  Serial.print('\n'); 
+  
+}
+
+void loop() {
+   
+   Serial.print("Lutfen MSB ve LSB adim dogal sayi degerlerini giriniz(MSB motoru pozitif, LSB negatif yonde dondurur. ");
+   Serial.print('\n');
+   
+   while (Serial.available() == 0) {
+     
+     }
+     
+     String MSB = Serial.readString();
+     MSB.trim();
+
+     int MSB_int = MSB.toInt();
+     
+     Serial.print("MSB ");
+     Serial.print((MSB_int));
+     Serial.print("\n");
+     
+
+     while (Serial.available() == 0) {
+     
+     }
+
+     String LSB = Serial.readString();
+     LSB.trim();
+
+     int LSB_int = LSB.toInt();
+     Serial.print("LSB ");
+     Serial.print(LSB_int);
+     Serial.print("\n");
+     Serial.print("MSB ve LSB degerlerini girdiniz. Lutfen komut seciniz:(git, sifirla, pozisyon sorgu) ");
+
+     while (Serial.available() == 0) {
+     
+     }
+    
+     String command = Serial.readString();
+    
+     command.trim();     
+     if (command == ("git")){ //position move command
+           
+          Serial.print('\n');
+          Serial.println("Motor hareket ediyor. ");
+           
+          temp = temp + MSB_int - LSB_int; 
+          motor.step(MSB_int);
+          motor.step(-LSB_int);
+
+          Serial.print('\n');
+          Serial.print("Motor konuma ulasti. Konumu: ");
+          Serial.print(temp);
+          Serial.print('\n');          
+     }
+
+     if (command == ("sifirla")){
+         if(temp > 0){
+          motor.step(-temp);          
+         }
+         else{
+          motor.step(-temp); 
+         }
+         temp = 0;
+         Serial.print('\n'); 
+         Serial.print("Motor konumu sifirlandi. ");
+         Serial.print('\n');                 
+     }
+
+     if (command == ("pozisyon sorgu")){
+         Serial.print('\n'); 
+         Serial.print("Motorun konumu: ");
+         Serial.print(temp);
+         Serial.print('\n');       
+     }
+     
+
+}
